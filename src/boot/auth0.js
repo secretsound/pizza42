@@ -6,7 +6,7 @@ import { api_audience, auth0_domain } from './auth0_conf';
 
 export const auth0Vue = createAuth0({
   domain: auth0_domain,
-  client_id: 'UEIQVRH3goVU8JZFva3qSMgh5nJUrlPF',
+  client_id: 'IaN1bDUvMr22u6SSFPNJ28XDpApLqB3K',
   redirect_uri: 'http://localhost:8080/#/',
   audience: api_audience,
   scope: 'write:order',
