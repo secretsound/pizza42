@@ -6,6 +6,7 @@
   "author": "",
   "private": true,
   "scripts": {
+    "build": "npm install && quasar build",
     "serve": "node ./server.mjs",
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
