@@ -132,25 +132,6 @@ export default defineComponent({
       food_prefs,
     };
   },
-  data() {
-    // let userObj = ref({
-    //   given_name: this.$auth0.user.value.given_name,
-    //   family_name: this.$auth0.user.value..family_name,
-    //   email: profile.value.email,
-    //   address: profile.value.address,
-    //   phone_number: profile.value.phone_number,
-    //   birthdate: profile.value.birthdate,
-    // });
-    // const food_prefs = ref({
-    //   vegan: metadata.value.food_prefs.vegan,
-    //   vegetarian: metadata.value.food_prefs.vegetarian,
-    //   keto: metadata.value.food_prefs.keto,
-    // });
-    // const contact_prefs = ref({
-    //   sms: metadata.value.contact_methods.sms,
-    //   email: metadata.value.contact_methods.email,
-    // });
-  },
   watch: {
     userObj: {
       deep: true,
