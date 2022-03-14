@@ -27,13 +27,13 @@
           <q-menu style="min-width: 10rem">
             <q-list bordered>
               <q-item-section>
-                <q-item clickable to="profile">Profile</q-item>
-                <q-item clickable>History</q-item>
-              </q-item-section>
-              <q-separator />
-
-              <q-item-section>
-                <q-item @click="logout" clickable>Logout</q-item>
+                <q-btn stretch flat to="profile" class="text-bold q-pa-sm"
+                  >Profile</q-btn
+                >
+                <q-separator />
+                <q-btn stretch flat class="text-bold q-pa-sm" @click="logout"
+                  >Log Off</q-btn
+                >
               </q-item-section>
             </q-list>
           </q-menu>
@@ -92,11 +92,13 @@ export default defineComponent({
     return {
       user,
       isAuthenticated,
-      logout,
       loginWithRedirect,
       showJson,
       showUserInfo: () => {
         showJson.value = true;
+      },
+      logout: async () => {
+        await logout({ returnTo: window.location.href });
       },
     };
   },
