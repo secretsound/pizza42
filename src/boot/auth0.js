@@ -8,7 +8,7 @@ let redirect_uri;
 if (process.env.NODE_ENV === 'production') {
   redirect_uri = 'https://pizza-42-2-pddo4.ondigitalocean.app/#/';
 } else {
-  redirect_uri = 'https://localhost:8080/#/';
+  redirect_uri = 'http://localhost:8080/#/';
 }
 
 export const auth0Vue = createAuth0({
