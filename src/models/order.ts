@@ -18,7 +18,11 @@ export class Order implements order {
     this.itemArray = items;
   }
 
-  toObject(): Object {
+  toString() {
+    return JSON.stringify(this.toJSON());
+  }
+
+  toJSON() {
     return {
       date: this.date,
       price: this.total,

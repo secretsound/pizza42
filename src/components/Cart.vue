@@ -37,13 +37,7 @@
           </q-item-section>
 
           <q-item-section top>
-            <q-btn
-              @click="removeItem(i.guid)"
-              icon="cancel"
-              flat
-              dense
-              fab-mini
-            />
+            <q-btn @click="remove(i.guid)" icon="cancel" flat dense fab-mini />
           </q-item-section>
           <q-separator />
         </q-item>
@@ -67,8 +61,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { cartStore } from 'src/stores/cartStore';
-import { storeToRefs } from 'pinia';
-import { Guid } from 'guid-typescript';
+import { storeToRefs, mapActions } from 'pinia';
 
 export default defineComponent({
   name: 'Cart',
@@ -80,9 +73,7 @@ export default defineComponent({
     return {
       currentCart,
       currentCartCount,
-      removeItem: (item: Guid) => {
-        store.remove(item);
-      },
+      ...mapActions(cartStore, ['remove']),
     };
   },
 });

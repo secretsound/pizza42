@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <div class="text-h3 q-my-xl">Checkout</div>
+    <div class="text-h4 q-my-xl">Checkout</div>
 
     <q-form>
       <div class="row">
@@ -10,7 +10,7 @@
             separator
             style="border: 1px solid grey"
           >
-            <q-item v-for="i in currentCart" :key="i.guid.toString">
+            <q-item v-for="i in currentCart" :key="i.guid">
               <q-item-section top avatar>
                 <q-img :src="i.picture" width="5rem" class="rounded-borders" />
               </q-item-section>
@@ -29,7 +29,7 @@
                   ${{ i.price }}
                   <span>
                     <q-btn
-                      @click="removeItem(i.guid)"
+                      @click="remove(i.guid)"
                       icon="cancel"
                       flat
                       dense
@@ -50,7 +50,7 @@
 
         <div class="col-4 rounded-borders" style="border: 1px solid grey">
           <q-card
-            v-if="!authenticated"
+            v-if="!isAuthenticated"
             flat
             class="q-mx-xl q-mt-xl"
             style="height: 30rem"
@@ -60,7 +60,7 @@
               Please login to continue with your purchase
             </div>
             <div class="q-mt-xl">
-              <q-btn color="primary" @click="login">Login</q-btn>
+              <q-btn color="primary" @click="loginWithRedirect">Login</q-btn>
             </div>
           </q-card>
           <div v-else class="q-px-md q-pt-md" style="height: 30rem">
@@ -138,7 +138,7 @@
           label="Buy"
           @click="order"
           color="primary"
-          :disable="!authenticated || !email_verified"
+          :disable="!isAuthenticated || !user.email_verified"
         />
         <q-btn
           label="Cancel"
@@ -188,20 +188,19 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { cartStore } from 'src/stores/cartStore';
-import { useUserStore } from 'src/stores/userStore';
-import { storeToRefs } from 'pinia';
-import { Order } from 'src/models/order';
-import { Guid } from 'guid-typescript';
-
-const store = cartStore();
-const { currentCart, currentCartTotalCost } = storeToRefs(store);
-
-const userStore = useUserStore();
-const { authenticated, email_verified } = storeToRefs(userStore);
+import { storeToRefs, mapActions } from 'pinia';
+import { sleep } from '../utils';
+import { useAuth0 } from '@auth0/auth0-vue';
 
 export default defineComponent({
   name: 'Checkout',
   setup() {
+    const store = cartStore();
+    const { currentCart, currentCartTotalCost } = storeToRefs(store);
+
+    const { isAuthenticated, user, getAccessTokenSilently, loginWithRedirect } =
+      useAuth0();
+
     let form = ref({
       address: null,
       secondary: null,
@@ -215,21 +214,15 @@ export default defineComponent({
     return {
       currentCart,
       currentCartTotalCost,
-      authenticated,
-      email_verified,
+      isAuthenticated,
+      loginWithRedirect,
+      getAccessTokenSilently,
+      user,
       form,
-      removeItem: (guid: Guid) => {
-        store.remove(guid);
-      },
-      login: async () => {
-        await userStore.login();
-      },
+      ...mapActions(cartStore, ['completeOrder', 'remove', 'clearCart']),
     };
   },
   data() {
-    async function sleep(ms: number) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
     const submittingOrder = ref(false);
 
     const popupTitle = ref('Completing your order');
@@ -242,23 +235,22 @@ export default defineComponent({
       popupSubTitle,
       popupStatus,
       order: async () => {
-        const l = store.cartToJson();
         submittingOrder.value = true;
-        const order = new Order(currentCartTotalCost.value, l);
-        await sleep(5000);
+        const token = await this.getAccessTokenSilently();
+        await this.completeOrder(this.user, token);
+        await sleep(4000);
 
         try {
-          await userStore.updateOrderHistory(order);
           popupStatus.value = 'success';
           popupTitle.value = 'Your order is Successful!';
           popupSubTitle.value = 'Returning you to the home screen.';
-          await sleep(5000);
-          store.clearCart();
+          await sleep(3000);
+          this.clearCart();
         } catch {
           popupStatus.value = 'failed';
           popupTitle.value = 'Something went wrong..';
           popupSubTitle.value = 'Please try again later';
-          await sleep(5000);
+          await sleep(3000);
         }
         submittingOrder.value = false;
         await this.$router.push('/');

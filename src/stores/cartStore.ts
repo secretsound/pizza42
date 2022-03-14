@@ -1,15 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Guid } from 'guid-typescript';
+import { User } from '@auth0/auth0-spa-js';
 import { defineStore } from 'pinia';
 import { Pizza, Soda } from '../models/products';
+import { Order } from '../models/order';
+import { plainToClass } from 'class-transformer';
+import axios from 'axios';
 
 export const cartStore = defineStore('cart', {
   persist: true,
   state: () => {
     return {
       cart: Array<Pizza | Soda>(),
-      cartCost: Number,
     };
   },
   actions: {
@@ -17,13 +20,11 @@ export const cartStore = defineStore('cart', {
       console.log(`Adding Item: ${item.title}`);
       this.cart.push(item);
     },
-    remove(guid: Guid) {
-      console.log('Starting');
+    remove(guid: string) {
       for (let i = 0; i < this.cart.length; i++) {
-        const y = this.cart[i].guid.toString();
-        const z = guid.toString();
+        const y = this.cart[i].guid;
+        const z = guid;
         if (y === z) {
-          console.log(`Index: ${i}`);
           this.cart.splice(i, 1);
           break;
         }
@@ -32,10 +33,35 @@ export const cartStore = defineStore('cart', {
     clearCart() {
       this.cart = [];
     },
-    cartToJson(): Array<Object> {
+    async completeOrder(user: User, token: string) {
+      const order = new Order(this.currentCartTotalCost, this.cartToJson());
+      const { data, status } = await axios.post(
+        '/api/v1/order',
+        { id: user.sub, order: order.toJSON() },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log(status);
+      return data;
+    },
+    cartToJson() {
       const l: Array<Object> = [];
       for (const i of this.cart) {
-        l.push(i);
+        let o;
+        if (typeof i === 'object') {
+          if (i.sku.includes('sku-p')) {
+            o = plainToClass(Pizza, i);
+          }
+          if (i.sku.includes('sku-s')) {
+            o = plainToClass(Soda, i);
+          }
+          console.log(i.sku);
+        } else {
+          o = JSON.parse(JSON.stringify(i));
+        }
+        l.push(o.toJSON());
       }
       return l;
     },

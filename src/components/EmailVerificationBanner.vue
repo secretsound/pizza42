@@ -1,6 +1,6 @@
 <template>
   <q-banner
-    v-if="authenticated && !email_verified"
+    v-if="isAuthenticated && !user.email_verified"
     inline-actions
     rounded
     class="bg-green text-white text-bold text-bold q-my-md text-center"
@@ -11,25 +11,18 @@
 </template>
 
 <script>
-import { useUserStore } from 'src/stores/userStore';
-import { storeToRefs } from 'pinia';
-import { mapActions } from 'pinia';
 import { defineComponent } from 'vue';
+import { useAuth0 } from '@auth0/auth0-vue';
 
 export default defineComponent({
   name: 'EmailVerificationBanner',
   setup() {
-    const store = useUserStore();
-    const { email_verified, authenticated } = storeToRefs(store);
+    const { isAuthenticated, user } = useAuth0();
 
     return {
-      useUserStore,
-      authenticated,
-      email_verified,
+      isAuthenticated,
+      user,
     };
-  },
-  methods: {
-    ...mapActions(useUserStore, ['resendVerification']),
   },
 });
 </script>

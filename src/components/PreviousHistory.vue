@@ -2,7 +2,7 @@
   <q-card flat>
     <div class="text-h4 q-my-lg">Order History</div>
     <div
-      v-if="metadata.history"
+      v-if="metadata"
       class="q-mt-md rounded-borders"
       style="border: 1px solid lightgray"
     >
@@ -41,16 +41,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { useUserStore } from '../stores/userStore';
-import { storeToRefs } from 'pinia';
+import { defineComponent, ref } from 'vue';
 import { DateTime } from 'luxon';
+import { useAuth0 } from '@auth0/auth0-vue';
 
 export default defineComponent({
   name: 'PreviousHistory',
   setup() {
-    const store = useUserStore();
-    const { metadata } = storeToRefs(store);
+    const { user, isAuthenticated } = useAuth0();
+
+    let metadata;
+    if (isAuthenticated.value) {
+      metadata = ref(user.value['http://metadata']);
+    }
 
     return {
       metadata,
@@ -74,9 +77,7 @@ export default defineComponent({
         paddingBottom: '3px',
       },
       convertTime: (time: number) => {
-        /* eslint-disable @typescript-eslint/no-unsafe-call */
         const i = DateTime.fromMillis(time);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return i.toLocaleString(DateTime.DATETIME_SHORT);
       },
     };

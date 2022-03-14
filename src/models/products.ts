@@ -21,7 +21,7 @@ export class Product implements product {
   readonly picture: string;
   readonly price: number;
 
-  guid: Guid;
+  guid: string;
 
   constructor(
     sku: string,
@@ -41,22 +41,26 @@ export class Product implements product {
   }
 
   generateGuid() {
-    return Guid.create();
+    return Guid.create().toString();
   }
 
-  toJsonString(): string {
-    return JSON.stringify({
+  toString() {
+    return JSON.stringify(this.toJSON());
+  }
+
+  toJSON() {
+    return {
       sku: this.sku,
       title: this.title,
       description: this.description,
       stars: this.stars,
       picture: this.picture,
       price: this.price,
-    });
+    };
   }
 }
 
-export class Pizza extends Product implements product {
+export class Pizza extends Product {
   constructor(
     sku: string,
     title: string,
@@ -69,7 +73,7 @@ export class Pizza extends Product implements product {
   }
 }
 
-export class Soda extends Product implements product {
+export class Soda extends Product {
   constructor(
     sku: string,
     title: string,

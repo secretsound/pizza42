@@ -32,7 +32,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { cartStore } from 'src/stores/cartStore';
-import { Pizza, Soda } from 'src/models/products';
+import { Soda } from 'src/models/products';
 
 const store = cartStore();
 
