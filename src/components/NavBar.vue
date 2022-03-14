@@ -5,6 +5,7 @@
         <q-btn flat to="/" ripple="false">
           <template v-slot:default>
             <img src="~assets/logo_transparent_crop.png" class="logo" />
+            <img src="~assets/logo_full.jpeg" class="logo" hidden />
           </template>
         </q-btn>
       </q-toolbar-title>
